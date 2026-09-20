@@ -1,0 +1,8 @@
+.git
+.github
+node_modules
+build
+test
+spotify-config.json
+*.md
+biome.jsonc

@@ -5,6 +5,12 @@
 
 A lightweight [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that enables AI assistants like Cursor & Claude to control Spotify playback and manage playlists.
 
+> **Fork notice** — this repository is a fork of
+> [marcelmarais/spotify-mcp-server](https://github.com/marcelmarais/spotify-mcp-server)
+> by [Marcel Marais](https://github.com/marcelmarais). All the MCP server code and
+> design are his work; this fork adds **Docker packaging** so the server can run
+> as a containerized service. See [DOCKER.md](DOCKER.md) for details.
+
 <details>
 <summary>Contents</summary>
 
@@ -21,6 +27,7 @@ A lightweight [Model Context Protocol (MCP)](https://modelcontextprotocol.io) se
   - [Spotify API Configuration](#spotify-api-configuration)
   - [Authentication Process](#authentication-process)
 - [Integrating with Claude Desktop, Cursor, and VsCode (Cline)](#integrating-with-claude-desktop-and-cursor)
+- [Docker](#docker)
 </details>
 
 ## Example Interactions
@@ -410,6 +417,33 @@ To set up your MCP correctly with Cline ensure you have the following file confi
 ```
 
 You can add additional tools to the auto approval array to run the tools without intervention.
+
+## Docker
+
+This fork packages the server as a Docker image. Because the upstream server
+speaks MCP over stdio, the image bundles
+[Supergateway](https://github.com/supercorp-ai/supergateway) to serve it as a
+**Streamable HTTP** MCP endpoint (SSE/WebSocket also available).
+
+Quickstart:
+
+```bash
+# 1. Credentials: create an app at https://developer.spotify.com/dashboard/
+#    with redirect URI http://127.0.0.1:8888/callback, then:
+cp spotify-config.example.json spotify-config.json   # fill in clientId/clientSecret
+npm ci && npm run auth                               # one-time browser login (Node 26+)
+
+# 2. Build and serve
+docker compose up -d --build
+```
+
+Your MCP endpoint is now `http://localhost:8080/mcp`. The Spotify config file is
+bind-mounted (never baked into the image) so the container can persist refreshed
+OAuth tokens.
+
+Clients that launch servers as commands can skip the port entirely and use
+`docker run -i` over stdio instead. Full instructions, client configs, and
+troubleshooting: **[DOCKER.md](DOCKER.md)**.
 
 ## Development
 

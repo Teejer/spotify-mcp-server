@@ -1,0 +1,16 @@
+services:
+  spotify-mcp:
+    build: .
+    image: spotify-mcp-server:latest
+    container_name: spotify-mcp
+    ports:
+      - "8080:8080"
+    volumes:
+      # The server writes refreshed OAuth tokens back to this file,
+      # so it must be mounted read-write (never run with :ro).
+      - ./spotify-config.json:/app/spotify-config.json
+    restart: unless-stopped
+    # The MCP server is stateless between tool calls (all state lives in the
+    # config file / Spotify), and Supergateway only serves authenticated
+    # tool calls, but it has no auth of its own — keep this on a trusted
+    # network or front it with a reverse proxy that adds authentication.
