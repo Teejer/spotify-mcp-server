@@ -9,7 +9,13 @@ as a network service. The image supports two ways of consuming the server.
 Create `spotify-config.json` in this directory (already copied from the example
 if you followed the setup) and fill in the app credentials from the
 [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/) —
-with a redirect URI of `http://127.0.0.1:8888/callback` registered on the app.
+with a redirect URI of `http://127.0.0.1:8889/callback` registered on the app.
+
+> This fork uses port **8889** (upstream suggests 8888) so the OAuth callback
+> doesn't collide with local model-inference servers that commonly bind 8888.
+> The port only matters during the one-time `npm run auth` browser flow —
+> changing it in `spotify-config.json` afterwards does **not** invalidate
+> existing tokens, as long as it matches what's registered on the Spotify app.
 
 **Never put this file in the image** — it is bind-mounted at runtime, and the
 server writes refreshed OAuth tokens back into it.
@@ -23,7 +29,7 @@ npm run auth        # opens the browser, tokens are saved into spotify-config.js
 ```
 
 …or entirely inside Docker (prints an authorization URL; authorize in your
-browser, then paste the full `http://127.0.0.1:8888/callback?...` URL from the
+browser, then paste the full `http://127.0.0.1:8889/callback?...` URL from the
 browser's address bar back into the terminal — it doesn't matter if the page
 itself fails to load):
 
